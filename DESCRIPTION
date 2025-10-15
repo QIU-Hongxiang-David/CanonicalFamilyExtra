@@ -1,0 +1,17 @@
+Package: CanonicalFamilyExtra
+Type: Package
+Title: Extra Canonical Link Family Objects for Generalized Linear Models
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Hongxiang", "Qiu",
+      email = "david940408@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: Extra family objects in "weird" scenarios, e.g., logistic or log-linear model with unbounded or non-binary/non-integer outcomes. Provides 'binomial_extra' and 'poisson_extra' as generalizations of 'binomial' and 'poisson'. The use of canonical link with the corresponding working likelihood ensures convexity, makeing model fitting reliable and independent of starting value.
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
+Suggests: glmnet, SuperLearner, ipred
