@@ -12,7 +12,7 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' @title Family object for fitting binomial (e.g., logistic, probit) regression model with potentially unbounded continuous outcome
 #' @name binomial_extra
 #' @description
-#' A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}.
+#' A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
 #' @details
 #' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.
 #'
@@ -23,8 +23,8 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' @section Warning:
 #'
 #' This function tweaks basic family objects and might remove some safety features. USE WITH CARE!!!
-#' @param link see \code{\link[stats:family]{family}}. Default to \code{"logit"}
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression.
+#' @param link see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. Other `variance` might lead to errors now.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.
 #' @returns a family object
 #'
@@ -80,40 +80,61 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #'
 #' @export
 binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","binomial")){
+    family<-match.arg(family)
     linktemp <- substitute(link)
-    if (!is.character(linktemp))
+    if (!is.character(linktemp)){
         linktemp <- deparse(linktemp)
-    if (linktemp %in% c("logit", "probit", "cloglog", "identity", "inverse", "log", "1/mu^2", "sqrt")){
+    }
+    # if (linktemp %in% c("logit", "probit", "cloglog", "identity", "inverse", "log", "1/mu^2", "sqrt")){
+    #     stats <- make.link(linktemp)
+    # }else if (is.character(link)) {
+    #     stats <- make.link(link)
+    #     linktemp <- link
+    # } else {
+    #     stats <- link
+    #     linktemp <- stats$name %||% deparse(linktemp)
+    # }
+    okLinks <- c("logit", "probit", "cloglog", "cauchit", "log", "identity","1/mu^2","sqrt","inverse")
+    if (linktemp %in% okLinks){
         stats <- make.link(linktemp)
     }else if (is.character(link)) {
         stats <- make.link(link)
         linktemp <- link
-    } else {
-        stats <- link
-        linktemp <- stats$name %||% deparse(linktemp)
+    }else {
+        if (inherits(link, "link-glm")) {
+            stats <- link
+            if (!is.null(stats$name))
+                linktemp <- stats$name
+        }
+        else {
+            stop(gettextf("link \"%s\" not available for binomial_extra; available links are %s",
+                          linktemp, paste(sQuote(okLinks), collapse = ", ")),
+                 domain = NA)
+        }
     }
-
-    family<-match.arg(family)
-
+    
+    
     variancetemp <- substitute(variance)
-    if (!is.character(variancetemp))
+    if (!is.character(variancetemp)){
         variancetemp <- deparse(variancetemp)
-
+    }
+    
     eps<-.Machine$double.eps
-
+    
     out<-do.call(quasi,list(link=linktemp,variance=variancetemp))
     out$family<-family
     out$linkfun<-function(mu){
-        .Call(stats:::C_logit_link, clip_interval(mu,eps,1-eps))
+        stats$linkfun(clip_interval(mu,eps,1-eps))
     }
     out$linkinv<-function(eta){
-        clip_interval(.Call(stats:::C_logit_linkinv, eta),eps,1-eps)
+        clip_interval(stats$linkinv(eta),eps,1-eps)
     }
     out$initialize<-expression({
         n <- rep.int(1, nobs)
         mustart <- pmax(0.001, pmin(0.999, y))
     })
     out$validmu<-binomial()$validmu
+    
     if(is.character(variancetemp) && variancetemp=="mu(1-mu)"){
         out$dev.resids<-function(y,mu,wt){
             mu<-clip_interval(mu,eps,1-eps)
@@ -132,7 +153,7 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' @title Family object for fitting log-linear model with potentially unbounded continuous outcome, particularly with Poisson working likelihood
 #' @name poisson_extra
 #' @description
-#' A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}.
+#' A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
 #' @details
 #' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
 #'
@@ -143,8 +164,8 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' @section Warning:
 #'
 #' This function tweaks basic family objects and might remove some safety features. \code{dev.resids} of the family object should not be interpreted as the usual deviance residual for statistical inference, but is -2 times the working log likelihood and only for optimization and model fitting. USE WITH CARE!!!
-#' @param link see \code{\link[stats:family]{family}}. Default to \code{"log"}
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression.
+#' @param link see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. Other `variance` might lead to errors now.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Seems not to matter for glm.
 #' @returns a family object
 #'
@@ -216,37 +237,48 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #'
 #' @export
 poisson_extra<-function(link="log",variance="mu",family=c("gaussian","poisson")){
+    family<-match.arg(family)
     linktemp <- substitute(link)
-    if (!is.character(linktemp))
+    if (!is.character(linktemp)){
         linktemp <- deparse(linktemp)
-    if (linktemp %in% c("log", "identity", "sqrt")){
+    }
+    okLinks <- c("log", "identity", "sqrt","1/mu^2","inverse")
+    if (linktemp %in% okLinks){
         stats <- make.link(linktemp)
     }else if (is.character(link)) {
         stats <- make.link(link)
         linktemp <- link
-    } else {
-        stats <- link
-        linktemp <- stats$name %||% deparse(linktemp)
+    }else {
+        if (inherits(link, "link-glm")) {
+            stats <- link
+            if (!is.null(stats$name)) 
+                linktemp <- stats$name
+        }
+        else {
+            stop(gettextf("link \"%s\" not available for poisson_extra family; available links are %s", 
+                          linktemp, paste(sQuote(okLinks), collapse = ", ")), 
+                 domain = NA)
+        }
     }
-    family<-match.arg(family)
-
+    
+    
     variancetemp <- substitute(variance)
     if (!is.character(variancetemp))
         variancetemp <- deparse(variancetemp)
-
+    
     eps<-.Machine$double.eps
-
+    
     out<-do.call(quasi,list(link=linktemp,variance=variancetemp))
     out$family<-family
     out$linkfun<-function(mu){
-        log(clip_interval(mu,eps))
+        stats$linkfun(clip_interval(mu,eps))
     }
     out$linkinv<-function(eta){
-        clip_interval(exp(eta),eps)
+        clip_interval(stats$linkinv(eta),eps)
     }
     out$initialize<-expression({
         n <- rep.int(1, nobs)
-        mustart <- pmax(y, .0001)
+        mustart <- pmax(0.001, y)
     })
     out$validmu<-poisson()$validmu
     if(is.character(variancetemp) && variancetemp=="mu"){

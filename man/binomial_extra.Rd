@@ -11,9 +11,9 @@ binomial_extra(
 )
 }
 \arguments{
-\item{link}{see \code{\link[stats:family]{family}}. Default to \code{"logit"}}
+\item{link}{see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. Other `variance` might lead to errors now.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.}
 }
@@ -21,7 +21,7 @@ binomial_extra(
 a family object
 }
 \description{
-A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}.
+A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
 }
 \details{
 This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.

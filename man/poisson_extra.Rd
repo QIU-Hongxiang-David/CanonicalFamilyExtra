@@ -7,9 +7,9 @@
 poisson_extra(link = "log", variance = "mu", family = c("gaussian", "poisson"))
 }
 \arguments{
-\item{link}{see \code{\link[stats:family]{family}}. Default to \code{"log"}}
+\item{link}{see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. Other `variance` might lead to errors now.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Seems not to matter for glm.}
 }
@@ -17,7 +17,7 @@ poisson_extra(link = "log", variance = "mu", family = c("gaussian", "poisson"))
 a family object
 }
 \description{
-A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}.
+A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
 }
 \details{
 This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
