@@ -287,7 +287,7 @@ poisson_extra<-function(link="log",variance="mu",family=c("gaussian","poisson"))
     }
     out$initialize<-expression({
         n <- rep.int(1, nobs)
-        mustart <- pmax(0.001, y)
+        mustart <- pmax(0.001, y) + .1
     })
     out$validmu<-poisson()$validmu
     if(is.character(variancetemp) && variancetemp=="mu"){
