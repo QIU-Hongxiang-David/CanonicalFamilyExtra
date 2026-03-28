@@ -9,7 +9,7 @@
 #' y <- expit(1 + X[,1]) + rnorm(100)
 #' require(SuperLearner)
 #' SuperLearner(y, data.frame(X), family=binomial_extra(), SL.library = c("SL.glmnet.extra"), cvControl = list(V = 2))
-#' 
+#' @export
 SL.glmnet.extra<-function (Y, X, newX, family, obsWeights, id, alpha = 1, nfolds = 10, nlambda = 100, useMin = TRUE, loss = "deviance", ...) {
     SuperLearner:::.SL.require("glmnet")
     if (!is.matrix(X)) {

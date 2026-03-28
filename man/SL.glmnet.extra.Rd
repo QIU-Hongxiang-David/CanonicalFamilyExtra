@@ -29,5 +29,4 @@ X <- matrix(rnorm(100 * 5), nrow = 100)
 y <- expit(1 + X[,1]) + rnorm(100)
 require(SuperLearner)
 SuperLearner(y, data.frame(X), family=binomial_extra(), SL.library = c("SL.glmnet.extra"), cvControl = list(V = 2))
-
 }
