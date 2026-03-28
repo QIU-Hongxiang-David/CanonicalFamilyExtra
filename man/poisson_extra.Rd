@@ -9,7 +9,7 @@ poisson_extra(link = "log", variance = "mu", family = c("gaussian", "poisson"))
 \arguments{
 \item{link}{see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. Other `variance` might lead to errors now.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Seems not to matter for glm.}
 }

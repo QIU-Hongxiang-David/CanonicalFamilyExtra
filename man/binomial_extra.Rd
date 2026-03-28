@@ -13,7 +13,7 @@ binomial_extra(
 \arguments{
 \item{link}{see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. Other `variance` might lead to errors now.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.}
 }

@@ -24,7 +24,7 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #'
 #' This function tweaks basic family objects and might remove some safety features. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. Other `variance` might lead to errors now.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.
 #' @returns a family object
 #'
@@ -174,7 +174,7 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #'
 #' This function tweaks basic family objects and might remove some safety features. \code{dev.resids} of the family object should not be interpreted as the usual deviance residual for statistical inference, but is -2 times the working log likelihood and only for optimization and model fitting. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. Other `variance` might lead to errors now.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Seems not to matter for glm.
 #' @returns a family object
 #'
