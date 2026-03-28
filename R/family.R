@@ -129,9 +129,18 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
     out$linkinv<-function(eta){
         clip_interval(stats$linkinv(eta),eps,1-eps)
     }
+    # out$initialize<-expression({
+    #     n <- rep.int(1, nobs)
+    #     mustart <- pmax(0.001, pmin(0.999, y))
+    # })
+    
     out$initialize<-expression({
+        if (is.factor(y)){
+            y <- y != levels(y)[1L]
+        }
         n <- rep.int(1, nobs)
-        mustart <- pmax(0.001, pmin(0.999, y))
+        y[weights == 0] <- 0
+        mustart <- (weights * pmax(0.001, pmin(0.999, y)) + 0.5)/(weights + 1)
     })
     out$validmu<-binomial()$validmu
     
