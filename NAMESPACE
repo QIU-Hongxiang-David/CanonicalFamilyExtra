@@ -3,6 +3,7 @@
 export(SL.glmnet.extra)
 export(binomial_extra)
 export(poisson_extra)
+export(screen.glmnet.extra)
 importFrom(stats,binomial)
 importFrom(stats,make.link)
 importFrom(stats,poisson)

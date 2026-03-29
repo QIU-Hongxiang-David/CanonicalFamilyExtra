@@ -23,10 +23,11 @@ SL.glmnet.extra(
 A wrapper of \code{\link[glmnet:cv.glmnet]{cv.glmnet}} similar to \code{\link[SuperLearner:SL.glmnet]{SL.glmnet}}, except that \code{family} can be \code{binomial_extra}. \code{\link[SuperLearner:SL.glmnet]{SL.glmnet}} only passes the name of \code{family} and thus cannot pass the full customized families like \code{\link[binomial_extra]{binomial_extra}}.
 }
 \examples{
-set.seed(123)
+set.seed(321)
 expit <- binomial()$linkinv
 X <- matrix(rnorm(100 * 5), nrow = 100)
 y <- expit(1 + X[,1]) + rnorm(100)
 require(SuperLearner)
-SuperLearner(y, data.frame(X), family=binomial_extra(), SL.library = c("SL.glmnet.extra"), cvControl = list(V = 2))
+SL.library<-list(c("SL.glmnet.extra","screen.glmnet.extra"))
+SuperLearner(y, data.frame(X), family=binomial_extra(), SL.library = SL.library, cvControl = list(V = 2))
 }
