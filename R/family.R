@@ -140,7 +140,7 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
         }
         n <- rep.int(1, nobs)
         y[weights == 0] <- 0
-        mustart <- (weights * pmax(0.001, pmin(0.999, y)) + 0.5)/(weights + 1)
+        mustart <- (weights * pmax(0, pmin(1, y)) + 0.5)/(weights + 1)
     })
     out$validmu<-binomial()$validmu
     
