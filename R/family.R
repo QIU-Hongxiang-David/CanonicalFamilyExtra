@@ -18,14 +18,16 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #'
 #' Particularly for logistic model, because of using the binomial working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 #'
-#' The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner::SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="binomial"}.
-#'
+#' The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="binomial"}.
+#' 
+#' When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{binomial_extra}, the working mean-variance relationship is determined by the \code{family} of \code{binomial_extra}. Need to specify \code{family="binomial"} to use binomial working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
+#' 
 #' @section Warning:
 #'
 #' This function tweaks basic family objects and might remove some safety features. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
 #' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
-#' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.
+#' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.
 #' @returns a family object
 #'
 #' @examples
@@ -76,7 +78,13 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' SuperLearner(y, data.frame(X), family = binomial_extra(family = "binomial"),
 #'              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
 #' }
-#'
+#' 
+#' #GEE
+#' x <- rnorm(100)
+#' y <- expit(1 + x) + rnorm(100)
+#' id <- rep(1:20, each=5)
+#' geepack::geeglm(y ~ x, family = binomial_extra(family = "binomial"), id = id)
+#' gee::gee(y ~ x, family = binomial_extra(family = "binomial"), id = id)
 #'
 #' @export
 binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","binomial")){
@@ -168,14 +176,16 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #'
 #' Particularly for log-linear model, because of using the Poisson working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 #'
-#' The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner::SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="poisson"}.
+#' The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="poisson"}.
+#' 
+#' When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{poisson_extra}, the working mean-variance relationship is determined by the \code{family} of \code{poisson_extra}. Need to specify \code{family="poisson"} to use Poisson working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
 #'
 #' @section Warning:
 #'
 #' This function tweaks basic family objects and might remove some safety features. \code{dev.resids} of the family object should not be interpreted as the usual deviance residual for statistical inference, but is -2 times the working log likelihood and only for optimization and model fitting. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
 #' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
-#' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Seems not to matter for glm.
+#' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.
 #' @returns a family object
 #'
 #' @examples
@@ -243,6 +253,12 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' glm(y~x, family = quasi(link = "log", variance = "constant"))
 #' }
 #'
+#' #GEE
+#' x <- rnorm(100)
+#' y <- exp(-1 + x) + rnorm(100)
+#' id <- rep(1:20, each=5)
+#' geepack::geeglm(y ~ x, family = poisson_extra(family = "poisson"), id = id)
+#' gee::gee(y ~ x, family = poisson_extra(family = "poisson"), id = id)
 #'
 #' @export
 poisson_extra<-function(link="log",variance="mu",family=c("gaussian","poisson")){

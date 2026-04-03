@@ -15,7 +15,7 @@ binomial_extra(
 
 \item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.}
 
-\item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Seems not to matter for glm.}
+\item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.}
 }
 \value{
 a family object
@@ -28,7 +28,9 @@ This family is useful, for example, when the estimand is a conditional probabili
 
 Particularly for logistic model, because of using the binomial working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 
-The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner::SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="binomial"}.
+The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="binomial"}.
+
+When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{binomial_extra}, the working mean-variance relationship is determined by the \code{family} of \code{binomial_extra}. Need to specify \code{family="binomial"} to use binomial working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
 }
 \section{Warning}{
 
@@ -85,5 +87,11 @@ SuperLearner(y, data.frame(X), family = binomial_extra(family = "binomial"),
              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
 }
 
+#GEE
+x <- rnorm(100)
+y <- expit(1 + x) + rnorm(100)
+id <- rep(1:20, each=5)
+geepack::geeglm(y ~ x, family = binomial_extra(family = "binomial"), id = id)
+gee::gee(y ~ x, family = binomial_extra(family = "binomial"), id = id)
 
 }
