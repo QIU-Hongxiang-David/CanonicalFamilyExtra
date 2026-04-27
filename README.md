@@ -2,7 +2,7 @@
 
 Extra Canonical Link Family Objects for Generalized Linear Models (R package)
 
-To install:
+To install from Github:
 ```{r}
 devtools::install_github("Qiu-Hongxiang-David/CanonicalFamilyExtra")
 ```

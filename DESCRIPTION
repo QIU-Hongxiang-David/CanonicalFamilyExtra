@@ -1,7 +1,7 @@
 Type: Package
 Package: CanonicalFamilyExtra
 Title: Extra Canonical Link Family Objects for Generalized Linear Models
-Version: 0.0.1
+Version: 1.0.0
 Authors@R: 
     person("Hongxiang", "Qiu", , "david940408@gmail.com", role = c("aut", "cre"))
 Description: Extra family objects in "weird" scenarios, particularly
