@@ -1,4 +1,4 @@
-#' @importFrom stats binomial make.link poisson quasi
+#' @importFrom stats binomial make.link poisson quasi coef model.matrix predict
 
 clip_interval<-function(x,lower=-Inf,upper=Inf){
     out<-pmax(pmin(x,upper),lower)
@@ -12,9 +12,9 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' @title Family object for fitting binomial (e.g., logistic, probit) regression model with potentially unbounded continuous outcome
 #' @name binomial_extra
 #' @description
-#' A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
+#' A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}} as well as \code{\link[SL.glmnet.extra]{SL.glmnet.extra}} and \code{\link[screen.glmnet.extra]{screen.glmnet.extra}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
 #' @details
-#' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.
+#' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed pseudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.
 #'
 #' Particularly for logistic model, because of using the binomial working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 #'
@@ -22,11 +22,8 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' 
 #' When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{binomial_extra}, the working mean-variance relationship is determined by the \code{family} of \code{binomial_extra}. Need to specify \code{family="binomial"} to use binomial working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
 #' 
-#' @section Warning:
-#'
-#' This function tweaks basic family objects and might remove some safety features. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) also works. Other `variance` might lead to unexpected errors.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.
 #' @returns a family object
 #'
@@ -170,21 +167,17 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' @title Family object for fitting log-linear model with potentially unbounded continuous outcome, particularly with Poisson working likelihood
 #' @name poisson_extra
 #' @description
-#' A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
+#' A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}} as well as \code{\link[SL.glmnet.extra]{SL.glmnet.extra}} and \code{\link[screen.glmnet.extra]{screen.glmnet.extra}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
 #' @details
-#' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
+#' This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed pseudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
 #'
 #' Particularly for log-linear model, because of using the Poisson working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 #'
 #' The output has \code{family="gaussian"} by default to be compatible with other learners in \code{\link[SuperLearner:SuperLearner]{SuperLearner}}, because when the outcome is continuous, other learners might not perform correctly with \code{family="poisson"}.
 #' 
 #' When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{poisson_extra}, the working mean-variance relationship is determined by the \code{family} of \code{poisson_extra}. Need to specify \code{family="poisson"} to use Poisson working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
-#'
-#' @section Warning:
-#'
-#' This function tweaks basic family objects and might remove some safety features. \code{dev.resids} of the family object should not be interpreted as the usual deviance residual for statistical inference, but is -2 times the working log likelihood and only for optimization and model fitting. USE WITH CARE!!!
 #' @param link see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.
-#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.
+#' @param variance see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) also works. Other `variance` might lead to unexpected errors.
 #' @param family The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.
 #' @returns a family object
 #'

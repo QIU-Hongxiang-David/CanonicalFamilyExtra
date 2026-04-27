@@ -15,8 +15,25 @@ screen.glmnet.extra(
   ...
 )
 }
+\arguments{
+\item{Y}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{X}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{family}{similar to \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}. Unlike \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}, the entire family object rather than the name of \code{family} (e.g., "gaussian", "binomial") will be passed to \code{\link[glmnet:cv.glmnet]{cv.glmnet}}}
+
+\item{alpha}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{minscreen}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{nfolds}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{nlambda}{see \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}}
+
+\item{...}{see \code{\link[SuperLearner:SL.glmnet]{SL.glmnet}}}
+}
 \description{
-A wrapper of \code{\link[glmnet:cv.glmnet]{cv.glmnet}} similar to \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}, except that \code{family} can be \code{binomial_extra}. \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}} only passes the name of \code{family} and thus cannot pass the full customized families like \code{\link[binomial_extra]{binomial_extra}}.
+A wrapper of \code{\link[glmnet:cv.glmnet]{cv.glmnet}} similar to \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}}, except that \code{family} can be \code{binomial_extra}. \code{\link[SuperLearner:screen.glmnet]{screen.glmnet}} only passes the name of \code{family} (e.g., "gaussian", "binomial") and thus cannot pass the full customized families like \code{\link[CanonicalFamilyExtra]{binomial_extra}}.
 }
 \examples{
 set.seed(321)
@@ -25,6 +42,7 @@ X <- matrix(rnorm(100 * 5), nrow = 100)
 y <- expit(1 + X[,1]) + rnorm(100)
 require(SuperLearner)
 SL.library<-list(c("SL.glmnet.extra","screen.glmnet.extra"))
-SuperLearner(y, data.frame(X), family=binomial_extra(), SL.library = SL.library, cvControl = list(V = 2))
+SuperLearner(y, data.frame(X), family=binomial_extra(),
+             SL.library = SL.library, cvControl = list(V = 2))
 
 }

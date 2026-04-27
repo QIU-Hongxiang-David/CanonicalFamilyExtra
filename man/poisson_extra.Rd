@@ -9,7 +9,7 @@ poisson_extra(link = "log", variance = "mu", family = c("gaussian", "poisson"))
 \arguments{
 \item{link}{see \code{\link[stats:family]{family}}. Default to \code{"log"}. When \code{variance="mu"}, use with care the links incompatible with the range \eqn{(0,\infty)}, namely \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu"}, same as Poisson regression. \code{"constant"} (Gaussian working mean-variance relationship) also works. Other `variance` might lead to unexpected errors.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"poisson"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.}
 }
@@ -17,10 +17,10 @@ poisson_extra(link = "log", variance = "mu", family = c("gaussian", "poisson"))
 a family object
 }
 \description{
-A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
+A family object for fitting Poisson models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,\infty)}) with continuous outcomes that may not be non-negative integers. Also works with \code{\link[glmnet:glmnet]{glmnet}} as well as \code{\link[SL.glmnet.extra]{SL.glmnet.extra}} and \code{\link[screen.glmnet.extra]{screen.glmnet.extra}}. Generally, the object aims to fit a model ranged in \eqn{(0,\infty)}.
 }
 \details{
-This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
+This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed pseudo-outcome so that the estimator is multiply robust, or estimating a positive regression function while the outcome might be negative or non-integers. Naive approaches such as \code{glm(family=poisson())}, \code{glm(family=quasipoisson())}, \code{glm(family=gaussian(link="log"))}, \code{glm(family=quasi(link="log",variance="constant"))} etc. might not work appropriately or reliably in such cases.
 
 Particularly for log-linear model, because of using the Poisson working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 
@@ -28,12 +28,6 @@ The output has \code{family="gaussian"} by default to be compatible with other l
 
 When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{poisson_extra}, the working mean-variance relationship is determined by the \code{family} of \code{poisson_extra}. Need to specify \code{family="poisson"} to use Poisson working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
 }
-\section{Warning}{
-
-
-This function tweaks basic family objects and might remove some safety features. \code{dev.resids} of the family object should not be interpreted as the usual deviance residual for statistical inference, but is -2 times the working log likelihood and only for optimization and model fitting. USE WITH CARE!!!
-}
-
 \examples{
 set.seed(123)
 

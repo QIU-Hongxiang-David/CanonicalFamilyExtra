@@ -13,7 +13,7 @@ binomial_extra(
 \arguments{
 \item{link}{see \code{\link[stats:family]{family}}. Default to \code{"logit"}. When \code{variance="mu(1-mu)"}, use with care the links incompatible with the range \eqn{[0,1]}, namely \code{"log"}, \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, and \code{"1/mu^2"}.}
 
-\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) should also work. Other `variance` might lead to errors now.}
+\item{variance}{see \code{\link[stats:family]{family}}. Default to \code{"mu(1-mu)"}, same as logistic regression. \code{"constant"} (Gaussian working mean-variance relationship) also works. Other `variance` might lead to unexpected errors.}
 
 \item{family}{The family of the returned family object. Either \code{"gaussian"} or \code{"binomial"}. Default to \code{"gaussian"}. Does not to matter for \code{\link[stats:glm]{glm}}. See details below when running GEE.}
 }
@@ -21,10 +21,10 @@ binomial_extra(
 a family object
 }
 \description{
-A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
+A family object for fitting binomial models (i.e., generalized linear models with range contained in the open unit interval \eqn{(0,1)}) with continuous outcomes that may fall outside the unit interval \eqn{[0,1]}. Also works with \code{\link[glmnet:glmnet]{glmnet}} as well as \code{\link[SL.glmnet.extra]{SL.glmnet.extra}} and \code{\link[screen.glmnet.extra]{screen.glmnet.extra}}. Generally, the object aims to fit a model ranged in \eqn{[0,1]}.
 }
 \details{
-This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed psudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.
+This family is useful, for example, when the estimand is a conditional probability function while the outcome is a transformed pseudo-outcome so that the estimator is multiply robust, or estimating a regression function with known bounds while the outcome might not respect the known bounds. Naive approaches such as \code{glm(family=binomial())}, \code{glm(family=quasibinomial())}, \code{glm(family=gaussian(link="logit"))}, \code{glm(family=quasi(link="logit",variance="constant"))} etc. might not work appropriately in such cases.
 
 Particularly for logistic model, because of using the binomial working likelihood and its canonical link, the model fitting is a convex problem and does not depend on starting value.
 
@@ -32,12 +32,6 @@ The output has \code{family="gaussian"} by default to be compatible with other l
 
 When running \code{\link[geepack:geeglm]{geeglm}} or \code{\link[gee:gee]{gee}} with \code{binomial_extra}, the working mean-variance relationship is determined by the \code{family} of \code{binomial_extra}. Need to specify \code{family="binomial"} to use binomial working mean-variance relationship. The default \code{"gaussian"} will lead to Gaussian working mean-variance relationship.
 }
-\section{Warning}{
-
-
-This function tweaks basic family objects and might remove some safety features. USE WITH CARE!!!
-}
-
 \examples{
 set.seed(123)
 expit <- binomial()$linkinv
