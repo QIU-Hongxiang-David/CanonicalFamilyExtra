@@ -35,15 +35,15 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' x <- rnorm(100)
 #' y <- expit(1 + x) + rnorm(100)
 #' glm(y~x, family = binomial_extra()) # or family=binomial_extra, or family="binomial_extra"
-#' # Errors or not so reliable
-#' \dontrun{
-#' glm(y~x, family = binomial())
-#' glm(y~x, family = quasibinomial())
-#' glm(y~x, family = gaussian(link = "logit"))
-#' # setting starting value might work, but is non-convex and requires starting value
-#' glm(y~x, family = gaussian(link = "logit"), start = c(-1,0))
-#' glm(y~x, family = quasi(link = "logit", variance = "constant"))
-#' }
+#' 
+#' # Counterexamples: These naive approaches yield errors or are not reliable
+#' try(glm(y~x, family = binomial()))
+#' try(glm(y~x, family = quasibinomial()))
+#' try(glm(y~x, family = gaussian(link = "logit")))
+#' # setting starting value might fix this approach,
+#' # but the problem is non-convex and requires valid starting value
+#' try(glm(y~x, family = gaussian(link = "logit"), start = c(-1,0)))
+#' try(glm(y~x, family = quasi(link = "logit", variance = "constant")))
 #'
 #' #glmnet
 #' X <- matrix(rnorm(100 * 5), nrow = 100)
@@ -51,12 +51,11 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' require(glmnet)
 #' glmnet(X, y, family = binomial_extra())
 #' # or family=binomial_extra; cannot use family="binomial_extra"
-#' # Errors
-#' \dontrun{
-#' glmnet(X, y, family = binomial())
-#' glmnet(X, y, family = gaussian(link = "logit"))
-#' glmnet(X, y, family = quasi(link = "logit", variance = "constant"))
-#' }
+#' 
+#' # Counterexamples: These naive approaches yield errors
+#' try(glmnet(X, y, family = binomial()))
+#' try(glmnet(X, y, family = gaussian(link = "logit")))
+#' try(glmnet(X, y, family = quasi(link = "logit", variance = "constant")))
 #'
 #' # other links/variance for glm
 #' x <- rnorm(100)
@@ -70,11 +69,6 @@ clip_interval<-function(x,lower=-Inf,upper=Inf){
 #' require(SuperLearner)
 #' SuperLearner(y, data.frame(X), family=binomial_extra(),
 #'              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-#' # Error in SL.ipredbagg because of wrong family
-#' \dontrun{
-#' SuperLearner(y, data.frame(X), family = binomial_extra(family = "binomial"),
-#'              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-#' }
 #' 
 #' #GEE
 #' x <- rnorm(100)
@@ -184,24 +178,22 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' @examples
 #' set.seed(123)
 #'
-#' #########
-#' # negative outcomes
-#' #########
 #' # glm
 #' x <- rnorm(100)
 #' y <- exp(-1 + x) + rnorm(100)
 #' glm(y~x, family = poisson_extra()) # or family=poisson_extra, or family="poisson_extra"
-#' # Errors or not so reliable
-#' \dontrun{
-#' glm(y~x, family = poisson())
-#' glm(y~x, family = quasipoisson())
-#' glm(y~x, family = gaussian(link = "log"))
-#' # setting starting value might work, but is non-convex and requires starting value
-#' glm(y~x, family = gaussian(link = "log"), start = c(-1,0))
-#' glm(y~x, family = quasi(link = "log", variance = "constant"))
-#' # setting starting value might work, but is non-convex and requires starting value
-#' glm(y~x, family = quasi(link = "log", variance = "constant"), start = c(-1,0))
-#' }
+#' 
+#' # Counterexamples: These naive approaches yield errors or are not reliable
+#' try(glm(y~x, family = poisson()))
+#' try(glm(y~x, family = quasipoisson()))
+#' try(glm(y~x, family = gaussian(link = "log")))
+#' # setting starting value might fix this approach,
+#' # but the problem is non-convex and requires valid starting value
+#' try(glm(y~x, family = gaussian(link = "log"), start = c(-1,0)))
+#' try(glm(y~x, family = quasi(link = "log", variance = "constant")))
+#' # setting starting value might fix this approach,
+#' # but the problem is non-convex and requires valid starting value
+#' try(glm(y~x, family = quasi(link = "log", variance = "constant"), start = c(-1,0)))
 #'
 #' #glmnet
 #' X <- matrix(rnorm(100 * 5), nrow = 100)
@@ -210,12 +202,10 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' glmnet(X, y, family = poisson_extra())
 #' # or family=poisson_extra; cannot use family="poisson_extra"
 #'
-#' # Errors
-#' \dontrun{
-#' glmnet(X, y, family = poisson())
-#' glmnet(X, y, family = gaussian(link = "log"))
-#' glmnet(X, y, family = quasi(link = "log", variance = "constant"))
-#' }
+#' # Counterexamples: These naive approaches yield errors or are not reliable
+#' try(glmnet(X, y, family = poisson()))
+#' try(glmnet(X, y, family = gaussian(link = "log")))
+#' try(glmnet(X, y, family = quasi(link = "log", variance = "constant")))
 #'
 #' # within SuperLearner
 #' X <- matrix(rnorm(100 * 3), nrow = 100)
@@ -223,28 +213,6 @@ binomial_extra<-function(link="logit",variance="mu(1-mu)",family=c("gaussian","b
 #' require(SuperLearner)
 #' SuperLearner(y, data.frame(X), family=poisson_extra(),
 #'              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-#' # Error in SL.ipredbagg because of wrong family
-#' \dontrun{
-#' SuperLearner(y, data.frame(X), family = poisson_extra(family = "poisson"),
-#'              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-#' }
-#'
-#'
-#' ########
-#' # positive non-integer outcomes
-#' ########
-#' x <- rnorm(100)
-#' y <- rexp(100, exp(1 - x))
-#' glm(y~x, family = poisson_extra())
-#' # Errors or not so reliable
-#' \dontrun{
-#' glm(y~x, family = poisson())
-#' glm(y~x, family = quasipoisson())
-#' # might work but is non-convex, so may depend on starting value
-#' glm(y~x, family = gaussian(link = "log"))
-#' # might work but is non-convex, so may depend on starting value
-#' glm(y~x, family = quasi(link = "log", variance = "constant"))
-#' }
 #'
 #' #GEE
 #' x <- rnorm(100)

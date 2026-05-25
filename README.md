@@ -7,6 +7,11 @@ To install from Github:
 devtools::install_github("Qiu-Hongxiang-David/CanonicalFamilyExtra")
 ```
 
+To install from CRAN:
+```{r}
+install.packages("CanonicalFamilyExtra")
+```
+
 Example:
 ```{r}
 library(CanonicalFamilyExtra)

@@ -14,14 +14,21 @@
 #' @param useMin see [SuperLearner::SL.glmnet()]
 #' @param loss see [SuperLearner::SL.glmnet()]
 #' @param ... see [SuperLearner::SL.glmnet()]
+#' @returns A list with two elements:
+#' \describe{
+#' \item{pred}{The predicted values for the rows in \code{newX}.}
+#' \item{fit}{A list. Contains all objects necessary to get predictions for new observations from specific algorithm.}
+#' }
+#' Similar to the value of [SuperLearner::SL.glmnet()].
 #' @examples
-#' if (interactive()){
+#' \donttest{
 #'     set.seed(321)
 #'     expit <- binomial()$linkinv
 #'     X <- matrix(rnorm(100 * 5), nrow = 100)
-#'     y <- expit(1 + X[,1]) + rnorm(100)
+#'     y <- expit(1 + X[,1] + X[,2]) + rnorm(100)
 #'     require(SuperLearner)
-#'     SL.library<-list(c("SL.glmnet.extra","screen.glmnet.extra"))
+#'     SL.library<-list(c("SL.glmnet.extra","All"),
+#'                      c("SL.glmnet.extra","screen.glmnet.extra"))
 #'     SuperLearner(y, data.frame(X), family=binomial_extra(),
 #'                  SL.library = SL.library, cvControl = list(V = 2))
 #' }
@@ -54,15 +61,17 @@ SL.glmnet.extra<-function (Y, X, newX, family, obsWeights, id, alpha = 1, nfolds
 #' @param minscreen see [SuperLearner::screen.glmnet()]
 #' @param nfolds see [SuperLearner::screen.glmnet()]
 #' @param nlambda see [SuperLearner::screen.glmnet()]
-#' @param ... see [SuperLearner::SL.glmnet()]
+#' @param ... see [SuperLearner::screen.glmnet()]
+#' @returns A logical vector with the length equal to the number of columns in X. TRUE indicates the variable (column of X) should be included. Similar to the value of [SuperLearner::screen.glmnet()].
 #' @examples
-#' if (interactive()){
+#' \donttest{
 #'     set.seed(321)
 #'     expit <- binomial()$linkinv
 #'     X <- matrix(rnorm(100 * 5), nrow = 100)
-#'     y <- expit(1 + X[,1]) + rnorm(100)
+#'     y <- expit(1 + X[,1] + X[,2]) + rnorm(100)
 #'     require(SuperLearner)
-#'     SL.library<-list(c("SL.glmnet.extra","screen.glmnet.extra"))
+#'     SL.library<-list(c("SL.glmnet.extra","All"),
+#'                      c("SL.glmnet.extra","screen.glmnet.extra"))
 #'     SuperLearner(y, data.frame(X), family=binomial_extra(),
 #'                  SL.library = SL.library, cvControl = list(V = 2))
 #' }

@@ -40,15 +40,15 @@ expit <- binomial()$linkinv
 x <- rnorm(100)
 y <- expit(1 + x) + rnorm(100)
 glm(y~x, family = binomial_extra()) # or family=binomial_extra, or family="binomial_extra"
-# Errors or not so reliable
-\dontrun{
-glm(y~x, family = binomial())
-glm(y~x, family = quasibinomial())
-glm(y~x, family = gaussian(link = "logit"))
-# setting starting value might work, but is non-convex and requires starting value
-glm(y~x, family = gaussian(link = "logit"), start = c(-1,0))
-glm(y~x, family = quasi(link = "logit", variance = "constant"))
-}
+
+# Counterexamples: These naive approaches yield errors or are not reliable
+try(glm(y~x, family = binomial()))
+try(glm(y~x, family = quasibinomial()))
+try(glm(y~x, family = gaussian(link = "logit")))
+# setting starting value might fix this approach,
+# but the problem is non-convex and requires valid starting value
+try(glm(y~x, family = gaussian(link = "logit"), start = c(-1,0)))
+try(glm(y~x, family = quasi(link = "logit", variance = "constant")))
 
 #glmnet
 X <- matrix(rnorm(100 * 5), nrow = 100)
@@ -56,12 +56,11 @@ y <- expit(1 + X[,1]) + rnorm(100)
 require(glmnet)
 glmnet(X, y, family = binomial_extra())
 # or family=binomial_extra; cannot use family="binomial_extra"
-# Errors
-\dontrun{
-glmnet(X, y, family = binomial())
-glmnet(X, y, family = gaussian(link = "logit"))
-glmnet(X, y, family = quasi(link = "logit", variance = "constant"))
-}
+
+# Counterexamples: These naive approaches yield errors
+try(glmnet(X, y, family = binomial()))
+try(glmnet(X, y, family = gaussian(link = "logit")))
+try(glmnet(X, y, family = quasi(link = "logit", variance = "constant")))
 
 # other links/variance for glm
 x <- rnorm(100)
@@ -75,11 +74,6 @@ y <- expit(1 + X[,1]) + rnorm(10)
 require(SuperLearner)
 SuperLearner(y, data.frame(X), family=binomial_extra(),
              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-# Error in SL.ipredbagg because of wrong family
-\dontrun{
-SuperLearner(y, data.frame(X), family = binomial_extra(family = "binomial"),
-             SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-}
 
 #GEE
 x <- rnorm(100)

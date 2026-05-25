@@ -31,24 +31,22 @@ When running \code{\link[geepack:geeglm]{geepack::geeglm()}} or \code{\link[gee:
 \examples{
 set.seed(123)
 
-#########
-# negative outcomes
-#########
 # glm
 x <- rnorm(100)
 y <- exp(-1 + x) + rnorm(100)
 glm(y~x, family = poisson_extra()) # or family=poisson_extra, or family="poisson_extra"
-# Errors or not so reliable
-\dontrun{
-glm(y~x, family = poisson())
-glm(y~x, family = quasipoisson())
-glm(y~x, family = gaussian(link = "log"))
-# setting starting value might work, but is non-convex and requires starting value
-glm(y~x, family = gaussian(link = "log"), start = c(-1,0))
-glm(y~x, family = quasi(link = "log", variance = "constant"))
-# setting starting value might work, but is non-convex and requires starting value
-glm(y~x, family = quasi(link = "log", variance = "constant"), start = c(-1,0))
-}
+
+# Counterexamples: These naive approaches yield errors or are not reliable
+try(glm(y~x, family = poisson()))
+try(glm(y~x, family = quasipoisson()))
+try(glm(y~x, family = gaussian(link = "log")))
+# setting starting value might fix this approach,
+# but the problem is non-convex and requires valid starting value
+try(glm(y~x, family = gaussian(link = "log"), start = c(-1,0)))
+try(glm(y~x, family = quasi(link = "log", variance = "constant")))
+# setting starting value might fix this approach,
+# but the problem is non-convex and requires valid starting value
+try(glm(y~x, family = quasi(link = "log", variance = "constant"), start = c(-1,0)))
 
 #glmnet
 X <- matrix(rnorm(100 * 5), nrow = 100)
@@ -57,12 +55,10 @@ require(glmnet)
 glmnet(X, y, family = poisson_extra())
 # or family=poisson_extra; cannot use family="poisson_extra"
 
-# Errors
-\dontrun{
-glmnet(X, y, family = poisson())
-glmnet(X, y, family = gaussian(link = "log"))
-glmnet(X, y, family = quasi(link = "log", variance = "constant"))
-}
+# Counterexamples: These naive approaches yield errors or are not reliable
+try(glmnet(X, y, family = poisson()))
+try(glmnet(X, y, family = gaussian(link = "log")))
+try(glmnet(X, y, family = quasi(link = "log", variance = "constant")))
 
 # within SuperLearner
 X <- matrix(rnorm(100 * 3), nrow = 100)
@@ -70,28 +66,6 @@ y <- exp(1 + X[,1]) + rnorm(10)
 require(SuperLearner)
 SuperLearner(y, data.frame(X), family=poisson_extra(),
              SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-# Error in SL.ipredbagg because of wrong family
-\dontrun{
-SuperLearner(y, data.frame(X), family = poisson_extra(family = "poisson"),
-             SL.library = c("SL.glm", "SL.ipredbagg"), cvControl = list(V = 2))
-}
-
-
-########
-# positive non-integer outcomes
-########
-x <- rnorm(100)
-y <- rexp(100, exp(1 - x))
-glm(y~x, family = poisson_extra())
-# Errors or not so reliable
-\dontrun{
-glm(y~x, family = poisson())
-glm(y~x, family = quasipoisson())
-# might work but is non-convex, so may depend on starting value
-glm(y~x, family = gaussian(link = "log"))
-# might work but is non-convex, so may depend on starting value
-glm(y~x, family = quasi(link = "log", variance = "constant"))
-}
 
 #GEE
 x <- rnorm(100)
